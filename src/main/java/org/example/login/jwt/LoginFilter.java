@@ -19,6 +19,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 //        this.authenticationManager = authenticationManager;
 //    }
 
+    // 필터로 form-data 정보를 받아 확인 후 가공
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         //클라이언트 요청에서 username, password 추출
