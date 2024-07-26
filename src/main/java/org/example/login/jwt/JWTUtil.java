@@ -1,7 +1,9 @@
 package org.example.login.jwt;
 
 import io.jsonwebtoken.Jwts;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -14,11 +16,13 @@ import java.util.Date;
 public class JWTUtil {
 
     // 키값 불러오기
-    private SecretKey secretKey;
+    private final SecretKey secretKey;
 
-    public JWTUtil(@Value("${spring.jwt.secret") String secret) {
+    public JWTUtil(@Value("${spring.jwt.secret}") String secret) {
+
         secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
+
 
     // 검증
     public String getUsername(String token) {
@@ -35,7 +39,7 @@ public class JWTUtil {
 
 
     // 생성
-    public String cretaJwt(String username, String role, Long expriedMs) {
+    public String createJwt(String username, String role, Long expriedMs) {
         return Jwts.builder()
                 .claim("username", username)
                 .claim("role", role)
