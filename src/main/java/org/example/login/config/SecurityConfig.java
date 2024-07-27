@@ -1,7 +1,5 @@
 package org.example.login.config;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import org.example.login.jwt.JWTFilter;
 import org.example.login.jwt.JWTUtil;
 import org.example.login.jwt.LoginFilter;
@@ -19,6 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
     // AuthenticationManager가 인자로 받을 AuthenticationConfiguraion 객체 생성자 주입
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
