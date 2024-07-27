@@ -1,6 +1,8 @@
 package org.example.login.config;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+import org.example.login.jwt.JWTFilter;
 import org.example.login.jwt.JWTUtil;
 import org.example.login.jwt.LoginFilter;
 import org.springframework.context.annotation.Bean;
@@ -60,6 +62,10 @@ public class SecurityConfig {
                         .requestMatchers("/login", "/", "join").permitAll() // 이 경로는 권안 허용
                         .requestMatchers("/admin").hasRole("ADMIN") // 어드민 경로는 어드민 권한을 가진 사람만 사용 가능
                         .anyRequest().authenticated()); // 나머지 다른 요청에 대해서는 로그인 한 사람만 가능
+
+        http
+                .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
+
 
         // 필터 추가 LoginFilter()는 인자를 받음 (AuthenticationManager() 메소드에 authenticationConfiguration 객체를 넣어야 함) 따라서 등록 필요
         http
