@@ -29,7 +29,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
         // Authorization 헤더 검증
         if (authorization == null || !authorization.startsWith("Bearer ")) {
-            System.out.println("token ull");
+            System.out.println("token null");
             filterChain.doFilter(request, response);
 
             // 조검이 해당되면 매소드 종료(필수)
