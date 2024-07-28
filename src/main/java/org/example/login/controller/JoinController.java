@@ -15,6 +15,11 @@ public class JoinController {
     private final JoinService joinService;
 
 
+    /**
+     * 회원가입을 진행하는 컨트롤러
+     * @param joinDTO @username @password
+     * @return String의 완료(ok) 사인 종료
+     */
     @PostMapping("/join")
     public String joinProcess(JoinDTO joinDTO) {
         joinService.joinProcess(joinDTO);
