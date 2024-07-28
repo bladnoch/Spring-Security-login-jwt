@@ -16,6 +16,10 @@ public class MainController {
 
     @GetMapping("/")
     public String mainP() {
+
+        /**
+         * SecurityContextHolder을 이용한 토큰을 통한 username, role 가져오기
+         */
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

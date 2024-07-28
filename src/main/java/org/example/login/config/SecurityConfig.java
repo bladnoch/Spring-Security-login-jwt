@@ -48,7 +48,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        // cors 설정
+        /**
+         * 클라이언트와의 cors 설정
+         */
         http
                 .cors((cors) -> cors
                         .configurationSource(new CorsConfigurationSource() {
@@ -71,14 +73,23 @@ public class SecurityConfig {
                         }));
 
         // csrf disable
+        /**
+         * CSRF: CSRF 공격은 사용자가 인증된 세션을 통해 악의적인 요청을 보내는 공격입니다. Spring Security는 기본적으로 CSRF 보호를 활성화합니다. -> disable
+         */
         http
                 .csrf((auth) -> auth.disable());
 
-        //Form 로그인 방식 disable
+        /**
+         * Form 로그인 방식 disable
+         * 토큰 기반 인증이나 OAuth2 등을 사용할 때 Form 로그인을 비활성화할 수 있습니다.
+         */
         http
                 .formLogin((auth) -> auth.disable());
 
         //http basic 인증 방식 disable
+        /**
+         * HTTP Basic 인증: HTTP Basic 인증은 사용자 이름과 비밀번호를 Base64로 인코딩하여 HTTP 헤더에 포함시키는 방식입니다. 간단하지만 보안에 취약할 수 있습니다. -> disable
+         */
         http
                 .httpBasic((auth) -> auth.disable());
 
