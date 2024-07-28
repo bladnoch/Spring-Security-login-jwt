@@ -1,5 +1,7 @@
 package org.example.login.config;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.tomcat.util.file.ConfigurationSource;
 import org.example.login.jwt.JWTFilter;
 import org.example.login.jwt.JWTUtil;
 import org.example.login.jwt.LoginFilter;
@@ -13,6 +15,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.Collection;
+import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
@@ -42,6 +49,28 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+        // cors 설정
+        http
+                .cors((cors) -> cors
+                        .configurationSource(new CorsConfigurationSource() {
+
+
+                            @Override
+                            public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+
+                                CorsConfiguration configuration = new CorsConfiguration();
+
+                                configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000")); // 3000번대 포트 사용가능
+                                configuration.setAllowedMethods(Collections.singletonList("*")); // get,post 등 모든 옵션 가능
+                                configuration.setAllowCredentials(true); // client-side에서 크리덴셜 설정을 하면 true로 설정
+                                configuration.setExposedHeaders(Collections.singletonList("*"));
+                                configuration.setMaxAge(3600L);
+
+                                configuration.setExposedHeaders(Collections.singletonList("Authorization")); // jwt를 넣을 auth를 허용
+                                return configuration;
+                            }
+                        }));
 
         // csrf disable
         http
