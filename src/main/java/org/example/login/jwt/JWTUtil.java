@@ -1,9 +1,7 @@
 package org.example.login.jwt;
 
 import io.jsonwebtoken.Jwts;
-import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
