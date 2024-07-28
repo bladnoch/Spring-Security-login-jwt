@@ -1,7 +1,6 @@
 package org.example.login.config;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.tomcat.util.file.ConfigurationSource;
 import org.example.login.jwt.JWTFilter;
 import org.example.login.jwt.JWTUtil;
 import org.example.login.jwt.LoginFilter;
@@ -18,7 +17,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-import java.util.Collection;
 import java.util.Collections;
 
 @Configuration
