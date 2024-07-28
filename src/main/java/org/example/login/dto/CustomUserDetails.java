@@ -13,10 +13,6 @@ public class CustomUserDetails implements UserDetails {
 
     private final UserEntity userEntity;
 
-//    public CustomUserDetails(UserEntity userEntity) {
-//        this.userEntity = userEntity;
-//    }
-
     @Override
     public boolean isAccountNonExpired() {
         return true;
