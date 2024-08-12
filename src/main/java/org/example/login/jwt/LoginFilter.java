@@ -1,9 +1,10 @@
 package org.example.login.jwt;
 
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.login.dto.CustomUserDetails;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -42,23 +43,46 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         return authenticationManager.authenticate(authToken);
     }
 
-    //로그인 성공시 실행하는 메소드 (여기서 JWT를 발급하면 됨)
+    // 로그인 성공시 실행하는 메소드 (여기서 JWT를 발급하면 됨)
+    // 하나의 토큰만 사용했을 경우 사용한 코드
+//    @Override
+//    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
+//
+//        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+//
+//        String username = customUserDetails.getUsername();
+//
+//        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+//        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
+//        GrantedAuthority auth = iterator.next();
+//
+//        String role = auth.getAuthority();
+//        String token = jwtUtil.createJwt(username, role, 60*60*10L);
+//
+//        response.addHeader("Authorization", "Bearer " + token);
+//
+//
+//    }
+    // access/refresh 를 위한 코드 v2ch4
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
 
-        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-
-        String username = customUserDetails.getUsername();
+        // 유저 정보
+        String username = authentication.getName();
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
         GrantedAuthority auth = iterator.next();
-
         String role = auth.getAuthority();
-        String token = jwtUtil.createJwt(username, role, 60*60*10L);
 
-        response.addHeader("Authorization", "Bearer " + token);
+        // 두가지의 토큰 생성 -> 생성엔 4개의 값이 필요
+        String access = jwtUtil.createJwt("access", username, role, 600000L); //10분,
+        String refresh = jwtUtil.createJwt("refresh", username, role, 36400000L); //24시간
 
+        // 응답 설정
+        response.setHeader("access", access); // header의 access key에다 넣어서 넘겨준다.
+        response.addCookie(createCookie("refresh", refresh)); //
+        response.setStatus(HttpStatus.OK.value());
 
     }
 
@@ -68,4 +92,17 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         response.setStatus(401);
 
     }
+
+    // refresh token을 담기위한 쿠키 생성 메소드
+    private Cookie createCookie(String key, String value) {
+
+        Cookie cookie = new Cookie(key, value);
+        cookie.setMaxAge(24 * 60 * 60);
+        // cookie.setSecure(true);  // https통신시 사용
+        // cookeie.setPath("/");    // 쿠키가 적용될 범위
+        cookie.setHttpOnly(true);
+
+        return cookie;
+    }
+
 }
