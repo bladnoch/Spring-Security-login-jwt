@@ -21,7 +21,7 @@ public class JWTUtil {
         secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 
-    // 검증 : 토큰의 종류 -> access, refresh
+    // 검증 : 토큰의 종류 -> access, refresh ch4v2
     public String getCategory(String token) {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("category", String.class);
     }
@@ -44,7 +44,7 @@ public class JWTUtil {
     // 토큰 생성 (토큰의 종류, 유저이름, role, 유효기간)
     public String createJwt(String category,String username, String role, Long expriedMs) {
         return Jwts.builder()
-                .claim("category", category)
+                .claim("category", category) // ch4v2
                 .claim("username", username)
                 .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))
