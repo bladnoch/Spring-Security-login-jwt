@@ -15,13 +15,13 @@ public class JWTUtil {
 
     // 키값 불러오기
     private final SecretKey secretKey;
-
+    // 키값 주입
     public JWTUtil(@Value("${spring.jwt.secret}") String secret) {
 
         secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 
-    // 검증 : 토큰의 종류
+    // 검증 : 토큰의 종류 -> access, refresh
     public String getCategory(String token) {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("category", String.class);
     }

@@ -32,7 +32,7 @@ public class SecurityConfig {
         this.jwtUtil = jwtUtil;
     }
 
-    // 검증할 때 캐시로 암호화 시켜서 검증, 진행 BCryptPasswordEncoder을 활
+    // 검증할 때 캐시로 암호화 시켜서 검증, 진행 BCryptPasswordEncoder을 활용
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
@@ -75,6 +75,7 @@ public class SecurityConfig {
         // csrf disable
         /**
          * CSRF: CSRF 공격은 사용자가 인증된 세션을 통해 악의적인 요청을 보내는 공격입니다. Spring Security는 기본적으로 CSRF 보호를 활성화합니다. -> disable
+         * 실제 서비스 환경에서도 CSRF는 disable하는 경우가 많음
          */
         http
                 .csrf((auth) -> auth.disable());
@@ -100,11 +101,14 @@ public class SecurityConfig {
                         .requestMatchers("/admin").hasRole("ADMIN") // 어드민 경로는 어드민 권한을 가진 사람만 사용 가능
                         .anyRequest().authenticated()); // 나머지 다른 요청에 대해서는 로그인 한 사람만 가능
 
+        // OAuth2 적용시 로그인에서 무한 루프가 일어날 경우 .addFilterBefore() -> .addFilterAfter()
+        // JWTFilter(),  JWTUtil 사용
         http
                 .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
 
 
         // 필터 추가 LoginFilter()는 인자를 받음 (AuthenticationManager() 메소드에 authenticationConfiguration 객체를 넣어야 함) 따라서 등록 필요
+        // LoginFilter(), JWTUtil
         http
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),jwtUtil), UsernamePasswordAuthenticationFilter.class);
 

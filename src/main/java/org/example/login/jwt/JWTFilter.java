@@ -15,6 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 // OncePerRequestFilter: 요청에 대해 한번만 진행
+// client 한테 받은 토큰을 확인
 @RequiredArgsConstructor
 public class JWTFilter extends OncePerRequestFilter {
 
@@ -22,6 +23,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
 
     // OncePerRequestFilter을 사용하기 위한 필수 함수
+    // 토큰 관리
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
@@ -29,6 +31,7 @@ public class JWTFilter extends OncePerRequestFilter {
         String authorization = request.getHeader("Authorization");
 
         // Authorization 헤더 검증
+        // 토큰 없을경우 실행
         if (authorization == null || !authorization.startsWith("Bearer ")) {
             System.out.println("token null");
             filterChain.doFilter(request, response);
@@ -43,6 +46,7 @@ public class JWTFilter extends OncePerRequestFilter {
         String token = authorization.split(" ")[1];
 
         // 토큰 소멸 시간 검증
+        // 소멸 시간 지났을 경우 실행
         if (jwtUtil.isExpired(token)) {
 
             System.out.println("token expired");
@@ -52,6 +56,7 @@ public class JWTFilter extends OncePerRequestFilter {
             return;
         }
 
+        // DB를 매번 조회하지 않고 토큰 정보를 제활용
         // 토큰에서 username과 role 획득
         String username = jwtUtil.getUsername(token);
         String role = jwtUtil.getRole(token);
@@ -59,10 +64,12 @@ public class JWTFilter extends OncePerRequestFilter {
         // userEntity를 생성하여 값 set
         UserEntity userEntity = new UserEntity();
         userEntity.setUsername(username);
-        // 한번만 사용되고 소멸되기 때문에 임시의 비밀번호를 넣어 userEntity를 생성
-        // token엔 비밀번호 정보가 없고(username, role)
-        // 만약 매번 생성때마다 db를 조회할 경우 효율이 좋지 않기 때문에
-        // 임시값을 넣어 토큰을 생성
+        /*
+            한번만 사용되고 소멸되기 때문에 임시의 비밀번호를 넣어 userEntity를 생성
+            token엔 비밀번호 정보가 없고(username, role)
+            만약 매번 생성때마다 db를 조회할 경우 효율이 좋지 않기 때문에
+            임시값을 넣어 토큰을 생성
+         */
         userEntity.setPassword("temppassword");
         userEntity.setRole(role);
 
