@@ -21,24 +21,30 @@ public class JWTUtil {
         secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 
-
-    // 검증
+    // 검증 : 토큰의 종류
+    public String getCategory(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("category", String.class);
+    }
+    // 검증 : 유저 이름
     public String getUsername(String token) {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("username", String.class);
     }
-
+    // 검증 : role
     public String getRole(String token) {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("role", String.class);
     }
-
+    // 검증 : 유효기간
     public Boolean isExpired(String token) { // timeout 확인
+
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
     }
 
 
-    // 생성
-    public String createJwt(String username, String role, Long expriedMs) {
+
+    // 토큰 생성 (토큰의 종류, 유저이름, role, 유효기간)
+    public String createJwt(String category,String username, String role, Long expriedMs) {
         return Jwts.builder()
+                .claim("category", category)
                 .claim("username", username)
                 .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))
