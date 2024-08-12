@@ -75,11 +75,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
-        // 두가지의 토큰 생성 -> 생성엔 4개의 값이 필요
+        // 두가지의 토큰 생성 -> 생성엔 4개의 값이 필요 ch4v2
         String access = jwtUtil.createJwt("access", username, role, 600000L); //10분,
         String refresh = jwtUtil.createJwt("refresh", username, role, 36400000L); //24시간
 
-        // 응답 설정
+        // 응답 설정 ch4v2
         response.setHeader("access", access); // header의 access key에다 넣어서 넘겨준다.
         response.addCookie(createCookie("refresh", refresh)); //
         response.setStatus(HttpStatus.OK.value());
@@ -93,7 +93,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     }
 
-    // refresh token을 담기위한 쿠키 생성 메소드
+    // refresh token을 담기위한 쿠키 생성 메소드 ch4v2
     private Cookie createCookie(String key, String value) {
 
         Cookie cookie = new Cookie(key, value);
