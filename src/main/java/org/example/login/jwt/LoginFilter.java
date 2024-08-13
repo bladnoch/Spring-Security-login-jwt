@@ -15,6 +15,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.util.Collection;
 import java.util.Iterator;
 
+
+// 로그인 시도시 진입
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
@@ -63,7 +65,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 //
 //
 //    }
+
     // access/refresh 를 위한 코드 v2ch4
+    // action: 로그인 성공 access token, refresh token 생 후 프론트로 넘겨줌
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
 
@@ -81,19 +85,21 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         // 응답 설정 ch4v2
         response.setHeader("access", access); // header의 access key에다 넣어서 넘겨준다.
-        response.addCookie(createCookie("refresh", refresh)); //
+        response.addCookie(createCookie("refresh", refresh)); // header에 쿠키로 담아 넘겨준다.
         response.setStatus(HttpStatus.OK.value());
 
     }
 
-    //로그인 실패시 실행하는 메소드
+    // action: 로그인 실패
+    // 에러를 반환 하여 넘겨 준다.
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
         response.setStatus(401);
 
     }
 
-    // refresh token을 담기위한 쿠키 생성 메소드 ch4v2
+    // refresh token 담은 cookie 생성
+    // refresh token 을 담기 위한 쿠키 생성 메소드 ch4v2
     private Cookie createCookie(String key, String value) {
 
         Cookie cookie = new Cookie(key, value);
