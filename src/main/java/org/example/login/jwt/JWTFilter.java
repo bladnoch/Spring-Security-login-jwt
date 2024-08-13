@@ -23,8 +23,6 @@ public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
 
-
-
     /*
         OncePerRequestFilter을 사용하기 위한 필수 함수
         토큰 관리
@@ -97,6 +95,10 @@ public class JWTFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         filterChain.doFilter(request, response);
+
+
+// ---------------------------------------------------------------------------------------------
+
 
         // token 1개만 사용할 때 사용하던 코드 acc/ref token 사용하면서 더이상 사용하지 않음
 //        // request에서 Authorization 헤더를 찾음

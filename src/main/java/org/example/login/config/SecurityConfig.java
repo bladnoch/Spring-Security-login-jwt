@@ -99,6 +99,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/login", "/", "join").permitAll() // 이 경로는 권안 허용
                         .requestMatchers("/admin").hasRole("ADMIN") // 어드민 경로는 어드민 권한을 가진 사람만 사용 가능
+                        .requestMatchers("/reissue").permitAll() // access가 만료되어 로그인이 안되어있는 상태기 때문에 permitAll()
                         .anyRequest().authenticated()); // 나머지 다른 요청에 대해서는 로그인 한 사람만 가능
 
         // OAuth2 적용시 로그인에서 무한 루프가 일어날 경우 .addFilterBefore() -> .addFilterAfter()
