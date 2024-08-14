@@ -5,18 +5,16 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.Collection;
 import java.util.Iterator;
 
-
-// 로그인 시도시 진입
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
@@ -27,7 +25,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         this.jwtUtil = jwtUtil;
     }
 
-    // 필터로 form-data 정보를 받아 확인 후 가공
+    // 필터로 http 정보를 받아 확인 후 가공
+    // 1. 들어온 정보를 바탕으로 authenticationManager에게 인증을 위한 토큰 생성후 반환
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         //클라이언트 요청에서 username, password 추출
@@ -39,35 +38,17 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         System.out.println("password = " + password);
 
         //스프링 시큐리티에서 username과 password를 검증하기 위해서는 token에 담아야 함
+        // AuthenticationManager로 전달을 하기위해 UsernamePaswordAuthenticationToken으로 캡슐화
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, password, null);
 
-        // token에 담은 검증을 위한 AuthenticationManager로 전달
+        // token에 담은 검증을 위한 AuthenticationManager로 전달해서 인증 시도
+        System.out.println("LoginFilter.attemptAuthentication");
         return authenticationManager.authenticate(authToken);
     }
 
-    // 로그인 성공시 실행하는 메소드 (여기서 JWT를 발급하면 됨)
-    // 하나의 토큰만 사용했을 경우 사용한 코드
-//    @Override
-//    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
-//
-//        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-//
-//        String username = customUserDetails.getUsername();
-//
-//        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-//        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
-//        GrantedAuthority auth = iterator.next();
-//
-//        String role = auth.getAuthority();
-//        String token = jwtUtil.createJwt(username, role, 60*60*10L);
-//
-//        response.addHeader("Authorization", "Bearer " + token);
-//
-//
-//    }
 
     // access/refresh 를 위한 코드 v2ch4
-    // action: 로그인 성공 access token, refresh token 생 후 프론트로 넘겨줌
+    // 2(성공). AuthenticationManager로 보내진 토큰을 바탕으로 인증 성공시 Authentication 객체 생성 이를 바탕으로 토큰 생성
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
 
@@ -85,21 +66,23 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         // 응답 설정 ch4v2
         response.setHeader("access", access); // header의 access key에다 넣어서 넘겨준다.
-        response.addCookie(createCookie("refresh", refresh)); // header에 쿠키로 담아 넘겨준다.
+        response.addCookie(createCookie("refresh", refresh)); //
         response.setStatus(HttpStatus.OK.value());
 
     }
 
-    // action: 로그인 실패
-    // 에러를 반환 하여 넘겨 준다.
+    // 로그인 실패시 실행하는 메소드
+    // 2(실패).실패한 경우에는 완전히 인증된 Authentication 객체가 생성되지 않는다.
+    // 대신, 실패 이유를 담은 AuthenticationException이 발생.
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
         response.setStatus(401);
+        System.out.println("잘못된 유저 또는 비밀번호 정보");
 
     }
 
-    // refresh token 담은 cookie 생성
-    // refresh token 을 담기 위한 쿠키 생성 메소드 ch4v2
+
+    // refresh token을 담기위한 쿠키 생성 메소드 ch4v2
     private Cookie createCookie(String key, String value) {
 
         Cookie cookie = new Cookie(key, value);
