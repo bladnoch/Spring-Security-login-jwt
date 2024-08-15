@@ -37,6 +37,8 @@ public class ReissueController {
         // 중요: 아래의 코드는 추후 서비스 단으로 리팩토링 해야함
         // 쿠키에서 refresh token 을 가져온다
         String refresh = null;
+
+        // 리프레시 토큰이 있는지 확인하는 코드 필요
         Cookie[] cookies = request.getCookies();
         for (Cookie cookie : cookies) {
 
