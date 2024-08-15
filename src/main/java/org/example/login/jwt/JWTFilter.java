@@ -37,6 +37,7 @@ public class JWTFilter extends OncePerRequestFilter {
         // 토큰이 없다면 다음 필터로 넘김
         // 권한이 필요 없는 경우도 있기 때문에 다음 필터로 넘긴다. ex) login
         if (accessToken == null) {
+            System.out.println("JWTFilter.doFilterInternal");
             System.out.println("no token");
             filterChain.doFilter(request, response);
 
@@ -50,6 +51,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
             //response body
             PrintWriter writer = response.getWriter();
+            System.out.println("JWTFilter.doFilterInternal");
             writer.print("access token expired");
 
             //response status code
