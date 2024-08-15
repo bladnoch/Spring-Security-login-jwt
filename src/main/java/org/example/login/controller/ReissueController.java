@@ -108,28 +108,28 @@ public class ReissueController {
 
     // ch8v2
     // refresh token을 DB에 저장
-    private void addRefreshEntity(String username, String refresh, Long expiredMs) {
-
-        Date date = new Date(System.currentTimeMillis() + expiredMs);
-
-        RefreshEntity refreshEntity = new RefreshEntity();
-        refreshEntity.setUsername(username);
-        refreshEntity.setRefresh(refresh);
-        refreshEntity.setExpiration(date.toString());
-
-        refreshRepository.save(refreshEntity);
-    }
-
-    private Cookie createCookie(String key, String value) {
-
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(24 * 60 * 60);
-        // cookie.setSecure(true);  // https통신시 사용
-        // cookeie.setPath("/");    // 쿠키가 적용될 범위
-        cookie.setHttpOnly(true);
-
-        return cookie;
-    }
+//    private void addRefreshEntity(String username, String refresh, Long expiredMs) {
+//
+//        Date date = new Date(System.currentTimeMillis() + expiredMs);
+//
+//        RefreshEntity refreshEntity = new RefreshEntity();
+//        refreshEntity.setUsername(username);
+//        refreshEntity.setRefresh(refresh);
+//        refreshEntity.setExpiration(date.toString());
+//
+//        refreshRepository.save(refreshEntity);
+//    }
+//
+//    private Cookie createCookie(String key, String value) {
+//
+//        Cookie cookie = new Cookie(key, value);
+//        cookie.setMaxAge(24 * 60 * 60);
+//        // cookie.setSecure(true);  // https통신시 사용
+//        // cookeie.setPath("/");    // 쿠키가 적용될 범위
+//        cookie.setHttpOnly(true);
+//
+//        return cookie;
+//    }
 }
 
 
