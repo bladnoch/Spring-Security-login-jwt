@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @ResponseBody
 @RequiredArgsConstructor
 public class JoinController {
-
     private final JoinService joinService;
 
 
