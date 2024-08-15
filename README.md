@@ -23,8 +23,10 @@
 ### refresh/access ch.7
 * reissue rotate 기능 추가해서 reissue 호출시 refresh token도 재발급
 
-### refresh/access ch.7
+### refresh/access ch.8
 * reissue 때 refresh token 재발급
 * RefreshRepository에 저장
 * 지금은 refresh token이 하나만 저장되는 문제가 있고
 * 나중에 모든 refresh token을 저장할꺼라면 여러 refresh token을 어떤식으로 저장하고 관리할지 결정해야함
+
+### refresh/access ch.9
