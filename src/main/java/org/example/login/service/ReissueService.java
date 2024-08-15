@@ -92,7 +92,7 @@ public class ReissueService {
 
     // ch8v2
     // refresh token을 DB에 저장
-    private void addRefreshEntity(String username, String refresh, Long expiredMs) {
+    public void addRefreshEntity(String username, String refresh, Long expiredMs) {
 
         Date date = new Date(System.currentTimeMillis() + expiredMs);
 
@@ -104,7 +104,7 @@ public class ReissueService {
         refreshRepository.save(refreshEntity);
     }
 
-    private Cookie createCookie(String key, String value) {
+    public Cookie createCookie(String key, String value) {
 
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(24 * 60 * 60);
