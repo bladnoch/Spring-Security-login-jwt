@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.example.login.domain.RefreshEntity;
 import org.example.login.repository.RefreshRepository;
 import org.springframework.http.HttpStatus;
@@ -17,17 +18,13 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 
+@RequiredArgsConstructor
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository; // ch8v2
 
-    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, RefreshRepository refreshRepository) {
-        this.authenticationManager = authenticationManager;
-        this.jwtUtil = jwtUtil;
-        this.refreshRepository = refreshRepository;
-    }
 
     // 필터로 http 정보를 받아 확인 후 가공
     // 1. 들어온 정보를 바탕으로 authenticationManager에게 인증을 위한 토큰 생성후 반환
