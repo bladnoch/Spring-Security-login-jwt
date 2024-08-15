@@ -1,37 +1,62 @@
 package org.example.login.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.example.login.domain.RefreshEntity;
+import org.example.login.dto.LoginDTO;
+import org.example.login.repository.RefreshRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.util.StreamUtils;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 
+@RequiredArgsConstructor
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
+    private final RefreshRepository refreshRepository; // ch8v2
 
-    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil) {
-        this.authenticationManager = authenticationManager;
-        this.jwtUtil = jwtUtil;
-    }
 
     // 필터로 http 정보를 받아 확인 후 가공
     // 1. 들어온 정보를 바탕으로 authenticationManager에게 인증을 위한 토큰 생성후 반환
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         //클라이언트 요청에서 username, password 추출
-        String username = obtainUsername(request);
-        String password = obtainPassword(request);
+        LoginDTO loginDTO = new LoginDTO();
+
+        // login DTO 에 mapping 해서 저장
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            ServletInputStream inputStream = request.getInputStream();
+            String messageBody = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
+            loginDTO = objectMapper.readValue(messageBody, LoginDTO.class); // ObjectMapper의 readValue 메서드는 JSON 문자열을 특정 자바 클래스(LoginDTO)로 변환
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        String username = loginDTO.getUsername();
+        String password = loginDTO.getPassword();
+
+
+//        String username = obtainUsername(request);
+//        String password = obtainPassword(request);
+
 
         System.out.println("LoginFilter.attemptAuthentication");
         System.out.println("username = " + username);
@@ -64,6 +89,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String access = jwtUtil.createJwt("access", username, role, 600000L); //10분,
         String refresh = jwtUtil.createJwt("refresh", username, role, 36400000L); //24시간
 
+
+        // refresh 토큰 저장
+        addRefreshEntity(username,refresh,86400000L);
+
         // 응답 설정 ch4v2
         response.setHeader("access", access); // header의 access key에다 넣어서 넘겨준다.
         response.addCookie(createCookie("refresh", refresh)); //
@@ -81,6 +110,19 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     }
 
+    // ch8v2
+    // refresh token을 DB에 저장
+    private void addRefreshEntity(String username, String refresh, Long expiredMs) {
+
+        Date date = new Date(System.currentTimeMillis() + expiredMs);
+
+        RefreshEntity refreshEntity = new RefreshEntity();
+        refreshEntity.setUsername(username);
+        refreshEntity.setRefresh(refresh);
+        refreshEntity.setExpiration(date.toString());
+
+        refreshRepository.save(refreshEntity);
+    }
 
     // refresh token을 담기위한 쿠키 생성 메소드 ch4v2
     private Cookie createCookie(String key, String value) {
