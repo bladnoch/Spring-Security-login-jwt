@@ -10,6 +10,7 @@ import org.example.login.repository.RefreshRepository;
 
 import java.io.IOException;
 
+// logout
 @RequiredArgsConstructor
 public class CustomLogoutFilter extends GenericFilter {
 
