@@ -9,7 +9,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-// 키 암호화 복호화
+// 키 암호화 복호화, 토큰생성
 @Component
 public class JWTUtil {
 
@@ -35,7 +35,6 @@ public class JWTUtil {
     }
     // 검증 : 유효기간
     public Boolean isExpired(String token) { // timeout 확인
-
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
     }
 
